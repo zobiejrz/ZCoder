@@ -19,15 +19,25 @@ class ZCoder
 
 	public static void main(String[] args)
 	{
-        // String a = args[0];
-        // System.out.println (a);
-        // decide whether we are encoding or decoding. 
-        // loop based on user input
+        /* This function will set mode to encode or decode, get a valid directory.
+        ** Then it will grab the file at the directory and pass it through AsciiToBinary or BinaryToAscii (depending on user input)
+        ** Then it will overwrite the directory with the new text
+        */
+
         Scanner sc = new Scanner(System.in);
+
         String mode = "";
+        String dir = "";
+
+        LinkedList<String> file = new LinkedList<String>();
+        LinkedList<String> outputFile = new LinkedList<String>();
+
+        // These variables are used for looping when input is incorrect
+        var hasValidDir = false;
         var validMode = false;
 
-        // ask user whether to encode or decode
+        // Asks user whether to encode or decode
+        // Will loop until input is either '1' or '2'
         do
         {
             System.out.println("Set mode equal to ENCODE (1) or DECODE (2)?");
@@ -48,14 +58,10 @@ class ZCoder
         }
         while(!validMode);
 
-        
 
-        var hasValidDir = false;
-        String dir = "";
-        // input file from specified directory
+        // Input file from a specified directory
+        // Will loop until it can find a file at the directory
         System.out.println ("Please input file directory:");
-
-        // LinkedList<String> output = new LinkedList<String>();
         do
         {
             dir = sc.nextLine();
@@ -73,34 +79,35 @@ class ZCoder
         }
         while (!hasValidDir);
 
+        // Sets LinkedList<String> file equal to the LinkedList<String> output from filGrab() using the directory
+        file = fileGrab(dir);
 
-
-        LinkedList<String> toBeSaved = new LinkedList<String>();
-
-
-        // decide whether to encode() or decode()
+        // Uses the inputted mode to process the file
+        // Using LinkedList<String> file will be sent line by line through AsciiToBinary() or BinaryToAscii() and added to LinkedList<String> outputFile
         switch (mode)
         {
             case "1":
-                toBeSaved = encode(dir);
+                
+                for (int i = 0; i<file.size(); i++)
+                {
+                    outputFile.add(AsciiToBinary(file.get(i)));
+                }
                 break;
             case "2":
-                toBeSaved = decode(dir);
-                break;
-            default:
-                System.out.println("var mode out of bounds");
-                break;
+                for (int i = 0; i<file.size(); i++)
+                {
+                    outputFile.add(BinaryToAscii(file.get(i)));
+                }
         }
-        sc.close();
 
+        // Each index of LinkedList<String> outputFile is know written to the inputted directory
         try
         {
             FileWriter fw = new FileWriter(dir);
-
 	        BufferedWriter bw = new BufferedWriter(fw);
-            for (int i = 0; i < toBeSaved.size(); i++)
+            for (int i = 0; i < outputFile.size(); i++)
             {
-                bw.write(toBeSaved.get(i));
+                bw.write(outputFile.get(i));
                 bw.newLine();
             }
             bw.close();
@@ -111,7 +118,7 @@ class ZCoder
         }
         
         // terminate
-
+        sc.close();
     }
 
     // Pulled from
@@ -140,7 +147,7 @@ class ZCoder
     {
         StringBuilder ascii = new StringBuilder();
         char c;
-        
+
         // original code was i+=9, that was incorrect.
         for (int i = 0; i <= binaryString.length() - 8; i += 8) {
             c = (char) Integer.parseInt(binaryString.substring(i, i + 8), 2);
@@ -148,21 +155,26 @@ class ZCoder
         }
         return ascii.toString();
     }
-    
-    private static LinkedList<String> encode(String dir)
+
+    private static LinkedList<String> fileGrab(String dir)
     {
 
-        // System.out.println ("This is where files would be encoded :-)");
-
-        Scanner usc = new Scanner (System.in);
-        // input file from specified directory
-
-        LinkedList<String> output = new LinkedList<String>();
+        /* This function will grab a file from an inputted directory and output a LinkedList<String> where every index is a line of the file
+        */
 
         Scanner fileGetter = new Scanner("FAKE TEXT THAT WILL BE CHANGED.txt");
+
+        // This is the file that is passed into Scanner fileGetter
         File file = new File(dir);
 
-        // Add all binary to output
+        // Scanner for user input (uSERscANNER)
+        Scanner usc = new Scanner (System.in);
+
+        // LinkedList<String> to be outputted.
+        LinkedList<String> output = new LinkedList<String>();
+
+        // Puts the file im grabbing into a Scanner
+        // This won't ever catch an exception because the directory was tested in public static void main(String[] args)
         try
         {
             fileGetter = new Scanner(file);
@@ -172,61 +184,20 @@ class ZCoder
             System.out.println ("Big Problems happened");
         }
 
+        // Puts file into LinkedList<String> output line by line.
         while (fileGetter.hasNext())
         {
-            
+
             var current = fileGetter.nextLine();
-            var binary = AsciiToBinary(current); 
-            output.add(binary);
+            output.add(current);
 
         }
 
-        // terminate
+        // closes scanners and returns the LinkedList<String> output
         fileGetter.close();
         usc.close();
 
-        return output;
+        return output;        
     }
-
-    private static LinkedList<String> decode(String dir)
-    {
-        
-                // System.out.println ("This is where files would be encoded :-)");
-
-                Scanner usc = new Scanner (System.in);
-                // input file from specified directory
-        
-                LinkedList<String> output = new LinkedList<String>();
-        
-                Scanner fileGetter = new Scanner("FAKE TEXT THAT WILL BE CHANGED.txt");
-                File file = new File(dir);
-        
-                // Add all binary to output
-                try
-                {
-                    fileGetter = new Scanner(file);
-                }
-                catch (Exception e)
-                {
-                    System.out.println ("Big Problems happened");
-                }
-        
-                while (fileGetter.hasNext())
-                {
-                    
-                    var current = fileGetter.nextLine();
-                    var binary = BinaryToAscii(current);
-         
-                    output.add(binary);
-        
-                }
-        
-                // terminate
-                fileGetter.close();
-                usc.close();
-        
-                return output;
-
-
-    }
+    
 }
