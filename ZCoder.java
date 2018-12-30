@@ -150,8 +150,20 @@ class ZCoder
 
         // original code was i+=9, that was incorrect.
         for (int i = 0; i <= binaryString.length() - 8; i += 8) {
-            c = (char) Integer.parseInt(binaryString.substring(i, i + 8), 2);
-            ascii.append(c);
+            
+            // Use try-catch to see if inputted data is valid, otherwise just return itself
+            try
+            {
+                var x = binaryString.substring(i, i + 8);
+                c = (char) Integer.parseInt(x, 2);
+                ascii.append(c);
+            }
+            catch(Exception e)
+            {
+                var errOutput = binaryString.substring(i, i + 8);
+                ascii.append(errOutput);
+            }
+                
         }
         return ascii.toString();
     }
