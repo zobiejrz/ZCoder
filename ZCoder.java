@@ -151,7 +151,7 @@ class ZCoder
         // original code was i+=9, that was incorrect.
         for (int i = 0; i <= binaryString.length() - 8; i += 8) {
             
-            // Use try-catch to see if inputted data is valid, otherwise just return itself
+            // Use try-catch to see if inputted data is valid (only 1s & 0s), otherwise just return itself
             try
             {
                 var x = binaryString.substring(i, i + 8);
@@ -160,7 +160,7 @@ class ZCoder
             }
             catch(Exception e)
             {
-                var errOutput = binaryString.substring(i, i + 8);
+                var errOutput = binaryString.substring(i, i + 0);
                 ascii.append(errOutput);
             }
                 
